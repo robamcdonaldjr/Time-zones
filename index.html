@@ -1,53 +1,48 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>US Time Zones</title>
-  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500&display=swap" rel="stylesheet">
+  <meta charset="UTF-8" />
+  <title>U.S. Time Zones</title>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600&display=swap" rel="stylesheet">
   <style>
     body {
       margin: 0;
       font-family: 'Orbitron', monospace;
-      background-image: url('https://upload.wikimedia.org/wikipedia/commons/7/76/Map_of_USA_with_state_names.svg'); /* Public domain US map */
-      background-size: cover;
-      background-position: center;
+      background-color: black;
+      color: white;
       height: 100vh;
       display: flex;
       align-items: center;
       justify-content: center;
-      color: white;
     }
 
-    .overlay {
-      background-color: rgba(0, 0, 0, 0.7);
-      padding: 30px;
-      border-radius: 10px;
+    .container {
       text-align: center;
+      z-index: 2;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 20px;
     }
 
-    #clock {
-      font-size: 72px;
-      margin-bottom: 30px;
-      background-color: rgba(0,0,0,0.7);
-      padding: 15px 30px;
-      border-radius: 10px;
+    .clock {
+      font-size: 4rem;
+      background: rgba(255, 255, 255, 0.1);
+      padding: 20px 40px;
+      border-radius: 15px;
       display: inline-block;
     }
 
-    #timezoneSelect {
-      font-size: 28px;
+    .timezone-select, .toggle-btn {
+      font-size: 1.5rem;
       padding: 10px 20px;
-      margin-top: 20px;
-      border-radius: 8px;
+      border-radius: 10px;
       border: none;
     }
 
-    #toggleFormat {
-      font-size: 18px;
-      margin-top: 15px;
-      padding: 6px 12px;
-      border: none;
-      border-radius: 6px;
+    .toggle-btn {
+      background-color: #444;
+      color: white;
       cursor: pointer;
     }
 
@@ -55,54 +50,55 @@
       position: absolute;
       left: 20px;
       top: 20px;
-      background-color: rgba(0, 0, 0, 0.85);
+      background-color: rgba(255, 255, 255, 0.1);
       padding: 15px 25px;
       border-radius: 10px;
-      font-size: 16px;
+      font-size: 0.9rem;
       line-height: 1.6;
       max-width: 150px;
     }
 
-    .military-guide h3 {
+    .military-guide h2 {
       margin-top: 0;
-      font-size: 18px;
+      font-size: 1rem;
       text-align: center;
       text-decoration: underline;
     }
   </style>
 </head>
 <body>
+
   <div class="military-guide">
-    <h3>Military Time</h3>
-    <p>00:00 = Midnight<br>
-    01:00 = 1 AM<br>
-    02:00 = 2 AM<br>
-    03:00 = 3 AM<br>
-    04:00 = 4 AM<br>
-    05:00 = 5 AM<br>
-    06:00 = 6 AM<br>
-    07:00 = 7 AM<br>
-    08:00 = 8 AM<br>
-    09:00 = 9 AM<br>
-    10:00 = 10 AM<br>
-    11:00 = 11 AM<br>
-    12:00 = Noon<br>
-    13:00 = 1 PM<br>
-    14:00 = 2 PM<br>
-    15:00 = 3 PM<br>
-    16:00 = 4 PM<br>
-    17:00 = 5 PM<br>
-    18:00 = 6 PM<br>
-    19:00 = 7 PM<br>
-    20:00 = 8 PM<br>
-    21:00 = 9 PM<br>
-    22:00 = 10 PM<br>
-    23:00 = 11 PM</p>
+    <h2>Military Time</h2>
+    00:00 — Midnight<br>
+    01:00 — 1 AM<br>
+    02:00 — 2 AM<br>
+    03:00 — 3 AM<br>
+    04:00 — 4 AM<br>
+    05:00 — 5 AM<br>
+    06:00 — 6 AM<br>
+    07:00 — 7 AM<br>
+    08:00 — 8 AM<br>
+    09:00 — 9 AM<br>
+    10:00 — 10 AM<br>
+    11:00 — 11 AM<br>
+    12:00 — Noon<br>
+    13:00 — 1 PM<br>
+    14:00 — 2 PM<br>
+    15:00 — 3 PM<br>
+    16:00 — 4 PM<br>
+    17:00 — 5 PM<br>
+    18:00 — 6 PM<br>
+    19:00 — 7 PM<br>
+    20:00 — 8 PM<br>
+    21:00 — 9 PM<br>
+    22:00 — 10 PM<br>
+    23:00 — 11 PM
   </div>
 
-  <div class="overlay">
-    <div id="clock">00:00:00</div><br>
-    <select id="timezoneSelect">
+  <div class="container">
+    <div class="clock" id="clock">--:--:--</div>
+    <select class="timezone-select" id="timezoneSelect">
       <option value="America/New_York">Eastern (New York)</option>
       <option value="America/Chicago">Central (Chicago)</option>
       <option value="America/Denver">Mountain (Denver)</option>
@@ -110,8 +106,8 @@
       <option value="America/Los_Angeles">Pacific (Los Angeles)</option>
       <option value="America/Anchorage">Alaska (Anchorage)</option>
       <option value="Pacific/Honolulu">Hawaii (Honolulu)</option>
-    </select><br>
-    <button id="toggleFormat">Switch to 12-Hour</button>
+    </select>
+    <button class="toggle-btn" id="toggleFormat">Switch to 12-Hour</button>
   </div>
 
   <script>

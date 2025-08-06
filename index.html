@@ -37,11 +37,17 @@
       display: inline-block;
     }
 
-    .timezone-select {
-      font-size: 2rem;
+    .timezone-select, .toggle-btn {
+      font-size: 1.5rem;
       padding: 10px 20px;
       border-radius: 10px;
       border: none;
+    }
+
+    .toggle-btn {
+      background-color: #333;
+      color: white;
+      cursor: pointer;
     }
 
     .military-guide {
@@ -115,6 +121,7 @@
       <option value="America/Anchorage">Alaska</option>
       <option value="Pacific/Honolulu">Hawaii</option>
     </select>
+    <button class="toggle-btn" id="toggleFormat">Switch to 12-Hour</button>
   </div>
 
   <script>
@@ -129,7 +136,10 @@
 
     const select = document.getElementById('timezoneSelect');
     const clock = document.getElementById('clock');
+    const toggleBtn = document.getElementById('toggleFormat');
     const body = document.body;
+
+    let use24Hour = true;
 
     function updateTime() {
       const tz = select.value;
@@ -138,7 +148,7 @@
         hour: '2-digit',
         minute: '2-digit',
         second: '2-digit',
-        hour12: false,
+        hour12: !use24Hour,
         timeZone: tz
       }).format(now);
       clock.textContent = time;
@@ -150,12 +160,17 @@
       body.style.backgroundImage = `url('${image}')`;
     }
 
+    toggleBtn.addEventListener('click', () => {
+      use24Hour = !use24Hour;
+      toggleBtn.textContent = use24Hour ? "Switch to 12-Hour" : "Switch to 24-Hour";
+      updateTime();
+    });
+
     // Initial setup
     updateTime();
     updateBackground();
     setInterval(updateTime, 1000);
 
-    // Change on selection
     select.addEventListener('change', () => {
       updateTime();
       updateBackground();

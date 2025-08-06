@@ -2,17 +2,28 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>World Timezones</title>
+  <title>U.S. Time Zones</title>
   <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500&display=swap" rel="stylesheet">
   <style>
     body {
       background-color: black;
       margin: 0;
       font-family: 'Orbitron', monospace;
+      color: white;
       display: flex;
-      flex-wrap: wrap;
-      justify-content: center;
+      flex-direction: column;
+      align-items: center;
       padding: 20px;
+    }
+
+    select {
+      font-size: 1rem;
+      padding: 10px;
+      margin-bottom: 20px;
+      background: white;
+      color: black;
+      border-radius: 5px;
+      border: none;
     }
 
     .clock {
@@ -48,39 +59,55 @@
 </head>
 <body>
 
-<script>
-  const timezones = Intl.supportedValuesOf('timeZone');
+  <select id="timezoneSelect">
+    <option value="America/New_York">Eastern (New York)</option>
+    <option value="America/Chicago">Central (Chicago)</option>
+    <option value="America/Denver">Mountain (Denver)</option>
+    <option value="America/Phoenix">Mountain (Phoenix - no DST)</option>
+    <option value="America/Los_Angeles">Pacific (Los Angeles)</option>
+    <option value="America/Anchorage">Alaska (Anchorage)</option>
+    <option value="Pacific/Honolulu">Hawaii (Honolulu)</option>
+  </select>
 
-  function createClock(timezone) {
-    const container = document.createElement('div');
-    container.className = 'clock';
-    container.id = `clock-${timezone.replaceAll('/', '_')}`;
+  <div id="clockContainer"></div>
 
-    const tzName = document.createElement('div');
-    tzName.className = 'timezone';
-    tzName.textContent = timezone;
+  <script>
+    const clockContainer = document.getElementById('clockContainer');
+    const timezoneSelect = document.getElementById('timezoneSelect');
 
-    const timeEl = document.createElement('div');
-    timeEl.className = 'time';
-    timeEl.id = timezone;
+    function createClock(timezone) {
+      clockContainer.innerHTML = ''; // clear previous clock
 
-    container.appendChild(tzName);
-    container.appendChild(timeEl);
-    document.body.appendChild(container);
-  }
+      const container = document.createElement('div');
+      container.className = 'clock';
+      container.id = `clock-${timezone.replaceAll('/', '_')}`;
 
-  function isDaytime(date, tz) {
-    const hour = new Intl.DateTimeFormat('en-US', {
-      hour: 'numeric',
-      hour12: false,
-      timeZone: tz
-    }).format(date);
-    return hour >= 6 && hour < 18;
-  }
+      const tzName = document.createElement('div');
+      tzName.className = 'timezone';
+      tzName.textContent = timezone;
 
-  function updateClocks() {
-    const now = new Date();
-    timezones.forEach(tz => {
+      const timeEl = document.createElement('div');
+      timeEl.className = 'time';
+      timeEl.id = timezone;
+
+      container.appendChild(tzName);
+      container.appendChild(timeEl);
+      clockContainer.appendChild(container);
+    }
+
+    function isDaytime(date, tz) {
+      const hour = new Intl.DateTimeFormat('en-US', {
+        hour: 'numeric',
+        hour12: false,
+        timeZone: tz
+      }).format(date);
+      return hour >= 6 && hour < 18;
+    }
+
+    function updateClock() {
+      const tz = timezoneSelect.value;
+      const now = new Date();
+
       const time = new Intl.DateTimeFormat('en-US', {
         hour: '2-digit',
         minute: '2-digit',
@@ -98,13 +125,18 @@
         container.classList.remove('day', 'night');
         container.classList.add(isDay ? 'day' : 'night');
       }
-    });
-  }
+    }
 
-  timezones.forEach(tz => createClock(tz));
-  setInterval(updateClocks, 1000);
-  updateClocks();
-</script>
+    timezoneSelect.addEventListener('change', () => {
+      createClock(timezoneSelect.value);
+      updateClock();
+    });
+
+    // Initialize
+    createClock(timezoneSelect.value);
+    setInterval(updateClock, 1000);
+    updateClock();
+  </script>
 
 </body>
 </html>

@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <title>U.S. Time Zone Clock</title>
-  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css22?family=Orbitron:wght@600&display=swap" rel="stylesheet">
   <style>
     * {
       box-sizing: border-box;
@@ -13,41 +13,42 @@
       margin: 0;
       padding: 0;
       height: 100%;
-      overflow: hidden;
       font-family: 'Orbitron', monospace;
+      display: flex;
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+      transition: background-image 1s ease-in-out;
     }
 
-    body {
+    #sidebar {
+      width: 250px;
+      background-color: rgba(0, 0, 0, 0.7);
+      color: white;
+      padding: 20px;
+      font-size: 0.9rem;
+      line-height: 1.6;
+    }
+
+    #main {
+      flex: 1;
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      transition: background-image 1s ease-in-out;
-      background-size: cover;
-      background-position: center;
-      background-repeat: no-repeat;
-    }
-
-    #overlay {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background-color: rgba(0, 0, 0, 0.5);
-      pointer-events: none;
+      padding: 20px;
+      position: relative;
+      z-index: 1;
     }
 
     select {
       font-size: 2rem;
       padding: 10px 20px;
       margin-bottom: 30px;
-      z-index: 2;
       border-radius: 10px;
     }
 
     .clock {
-      z-index: 2;
       background-color: rgba(0, 0, 0, 0.6);
       color: white;
       padding: 30px 50px;
@@ -56,30 +57,48 @@
       box-shadow: 0 0 20px rgba(0,0,0,0.7);
     }
 
-    .fade {
-      animation: fadeEffect 1s ease-in-out;
+    h3 {
+      margin-top: 0;
+      font-size: 1.2rem;
+      text-align: center;
     }
 
-    @keyframes fadeEffect {
-      from { opacity: 0.4; }
-      to { opacity: 1; }
+    ul {
+      padding-left: 20px;
+      margin: 0;
     }
   </style>
 </head>
 <body>
-  <div id="overlay"></div>
 
-  <select id="timezoneSelect">
-    <option value="America/New_York">Eastern (New York)</option>
-    <option value="America/Chicago">Central (Chicago)</option>
-    <option value="America/Denver">Mountain (Denver)</option>
-    <option value="America/Phoenix">Mountain (Phoenix - no DST)</option>
-    <option value="America/Los_Angeles">Pacific (Los Angeles)</option>
-    <option value="America/Anchorage">Alaska (Anchorage)</option>
-    <option value="Pacific/Honolulu">Hawaii (Honolulu)</option>
-  </select>
+  <div id="sidebar">
+    <h3>🕒 Military Time Guide</h3>
+    <ul>
+      <li>00:00 — Midnight</li>
+      <li>01:00 — 1 AM</li>
+      <li>02:00 — 2 AM</li>
+      <li>... (up to)</li>
+      <li>12:00 — Noon</li>
+      <li>13:00 — 1 PM</li>
+      <li>14:00 — 2 PM</li>
+      <li>... (up to)</li>
+      <li>23:00 — 11 PM</li>
+    </ul>
+  </div>
 
-  <div class="clock" id="clockDisplay">--:--:--</div>
+  <div id="main">
+    <select id="timezoneSelect">
+      <option value="America/New_York">Eastern (New York)</option>
+      <option value="America/Chicago">Central (Chicago)</option>
+      <option value="America/Denver">Mountain (Denver)</option>
+      <option value="America/Phoenix">Mountain (Phoenix - no DST)</option>
+      <option value="America/Los_Angeles">Pacific (Los Angeles)</option>
+      <option value="America/Anchorage">Alaska (Anchorage)</option>
+      <option value="Pacific/Honolulu">Hawaii (Honolulu)</option>
+    </select>
+
+    <div class="clock" id="clockDisplay">--:--:--</div>
+  </div>
 
   <script>
     const timezoneSelect = document.getElementById('timezoneSelect');
@@ -87,46 +106,16 @@
     const body = document.body;
 
     const backgrounds = {
-      "America/New_York": [
-        "https://images.unsplash.com/photo-1570132387964-fd8eab03f04a",
-        "https://images.unsplash.com/photo-1596390382722-7a4e25f7c4a4",
-        "https://images.unsplash.com/photo-1532210318572-dfb1b01f0e77"
-      ],
-      "America/Chicago": [
-        "https://images.unsplash.com/photo-1583307770673-2fa503c9baf8",
-        "https://images.unsplash.com/photo-1531259683007-016a7b628fc9",
-        "https://images.unsplash.com/photo-1527181152855-fc03fc7949c8"
-      ],
-      "America/Denver": [
-        "https://images.unsplash.com/photo-1609960067230-b1c61e4016a1",
-        "https://images.unsplash.com/photo-1507525428034-b723cf961d3e",
-        "https://images.unsplash.com/photo-1604603260971-69e92f2f4a00"
-      ],
-      "America/Phoenix": [
-        "https://images.unsplash.com/photo-1579977541309-2c2e729dafaf",
-        "https://images.unsplash.com/photo-1552089123-2b66799da7f8",
-        "https://images.unsplash.com/photo-1618500851011-b8c8a78a8c11"
-      ],
-      "America/Los_Angeles": [
-        "https://images.unsplash.com/photo-1506744038136-46273834b3fb",
-        "https://images.unsplash.com/photo-1567450935814-54a43e4cd7a7",
-        "https://images.unsplash.com/photo-1496483648148-47c686dc86a8"
-      ],
-      "America/Anchorage": [
-        "https://images.unsplash.com/photo-1598454448770-ecf84c49e4a7",
-        "https://images.unsplash.com/photo-1583805251768-0f942f16e5d3",
-        "https://images.unsplash.com/photo-1606117196093-7ab7f479c8f5"
-      ],
-      "Pacific/Honolulu": [
-        "https://images.unsplash.com/photo-1507525428034-b723cf961d3e",
-        "https://images.unsplash.com/photo-1600607686989-9019e972d0f5",
-        "https://images.unsplash.com/photo-1596547606079-bf40ebdc70b6"
-      ]
+      "America/New_York": "https://images.unsplash.com/photo-1506748686214-e9df14d4d9d0",
+      "America/Chicago": "https://images.unsplash.com/photo-1604908554024-21c278f18c6f",
+      "America/Denver": "https://images.unsplash.com/photo-1503437313881-503a91226402",
+      "America/Phoenix": "https://images.unsplash.com/photo-1542314831-068cd1dbfeeb",
+      "America/Los_Angeles": "https://images.unsplash.com/photo-1506744038136-46273834b3fb",
+      "America/Anchorage": "https://images.unsplash.com/photo-1611951241275-12c9903b2e0d",
+      "Pacific/Honolulu": "https://images.unsplash.com/photo-1507525428034-b723cf961d3e"
     };
 
-    let bgIndex = 0;
     let currentTz = timezoneSelect.value;
-    let bgTimer;
 
     function updateClock() {
       const now = new Date();
@@ -137,39 +126,27 @@
         hour12: false,
         timeZone: currentTz
       }).format(now);
-
       clockDisplay.textContent = time;
     }
 
-    function changeBackground() {
-      const images = backgrounds[currentTz];
-      if (!images || images.length === 0) return;
-
-      bgIndex = (bgIndex + 1) % images.length;
-      const url = `${images[bgIndex]}?auto=format&fit=crop&w=1600&q=80`;
-      body.classList.remove("fade");
-      void body.offsetWidth; // trigger reflow
-      body.classList.add("fade");
-      body.style.backgroundImage = `url('${url}')`;
-    }
-
-    function startBackgroundCycle() {
-      changeBackground(); // immediately show first image
-      clearInterval(bgTimer);
-      bgTimer = setInterval(changeBackground, 7000); // every 7 seconds
+    function updateBackground() {
+      const image = backgrounds[currentTz];
+      if (image) {
+        body.style.backgroundImage = `url('${image}?auto=format&fit=crop&w=1600&q=80')`;
+      }
     }
 
     timezoneSelect.addEventListener("change", () => {
       currentTz = timezoneSelect.value;
-      bgIndex = -1;
-      startBackgroundCycle();
       updateClock();
+      updateBackground();
     });
 
-    // Init
-    startBackgroundCycle();
-    setInterval(updateClock, 1000);
+    // Initialize
+    updateBackground();
     updateClock();
+    setInterval(updateClock, 1000);
   </script>
+
 </body>
 </html>

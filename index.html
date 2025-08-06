@@ -12,29 +12,16 @@
       color: white;
       font-family: 'Orbitron', monospace;
       display: flex;
-      flex-direction: row;
-      min-height: 100vh;
-    }
-
-    .sidebar {
-      width: 250px;
-      padding: 20px;
-      background-color: rgba(255, 255, 255, 0.05);
-      font-size: 1.1em;
-    }
-
-    .content {
-      flex-grow: 1;
-      display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
       text-align: center;
+      min-height: 100vh;
       padding: 20px;
     }
 
     .date {
-      font-size: 1.5em;
+      font-size: 1.6em;
       margin-bottom: 10px;
     }
 
@@ -49,11 +36,11 @@
     select {
       font-size: 1.5em;
       padding: 10px 20px;
-      margin: 10px 0;
+      margin-bottom: 20px;
     }
 
     .toggle-button {
-      margin: 20px;
+      margin: 10px;
       padding: 10px 20px;
       font-size: 1.2em;
       cursor: pointer;
@@ -64,75 +51,27 @@
       padding: 15px;
       border-radius: 10px;
       font-size: 1.1em;
-      text-align: center;
       max-width: 600px;
-    }
-
-    .sidebar h3 {
-      margin-top: 0;
-    }
-
-    .sidebar ul {
-      list-style: none;
-      padding: 0;
-    }
-
-    .sidebar li {
-      margin: 5px 0;
     }
   </style>
 </head>
 <body>
 
-  <!-- MILITARY TIME GUIDE -->
-  <div class="sidebar">
-    <h3>Military Time Guide</h3>
-    <ul>
-      <li>00:00 – Midnight</li>
-      <li>01:00 – 1 AM</li>
-      <li>02:00 – 2 AM</li>
-      <li>03:00 – 3 AM</li>
-      <li>04:00 – 4 AM</li>
-      <li>05:00 – 5 AM</li>
-      <li>06:00 – 6 AM</li>
-      <li>07:00 – 7 AM</li>
-      <li>08:00 – 8 AM</li>
-      <li>09:00 – 9 AM</li>
-      <li>10:00 – 10 AM</li>
-      <li>11:00 – 11 AM</li>
-      <li>12:00 – Noon</li>
-      <li>13:00 – 1 PM</li>
-      <li>14:00 – 2 PM</li>
-      <li>15:00 – 3 PM</li>
-      <li>16:00 – 4 PM</li>
-      <li>17:00 – 5 PM</li>
-      <li>18:00 – 6 PM</li>
-      <li>19:00 – 7 PM</li>
-      <li>20:00 – 8 PM</li>
-      <li>21:00 – 9 PM</li>
-      <li>22:00 – 10 PM</li>
-      <li>23:00 – 11 PM</li>
-    </ul>
-  </div>
+  <div class="date" id="date"></div>
+  <div class="clock" id="clock">--:--:--</div>
 
-  <!-- MAIN CONTENT -->
-  <div class="content">
-    <div class="date" id="date"></div>
-    <div class="clock" id="clock">--:--:--</div>
+  <select id="timezone">
+    <option value="America/New_York">Eastern (New York)</option>
+    <option value="America/Chicago">Central (Chicago)</option>
+    <option value="America/Denver">Mountain (Denver)</option>
+    <option value="America/Los_Angeles">Pacific (Los Angeles)</option>
+    <option value="America/Anchorage">Alaska (Anchorage)</option>
+    <option value="Pacific/Honolulu">Hawaii (Honolulu)</option>
+  </select>
 
-    <select id="timezone">
-      <option value="America/New_York">Eastern (New York)</option>
-      <option value="America/Chicago">Central (Chicago)</option>
-      <option value="America/Denver">Mountain (Denver)</option>
-      <option value="America/Los_Angeles">Pacific (Los Angeles)</option>
-      <option value="America/Anchorage">Alaska (Anchorage)</option>
-      <option value="Pacific/Honolulu">Hawaii (Honolulu)</option>
-    </select>
+  <button class="toggle-button" onclick="toggleFormat()">Switch to 12-Hour</button>
 
-    <button class="toggle-button" onclick="toggleFormat()">Switch to 12-Hour</button>
-
-    <div class="info-box" id="timezoneInfo"></div>
-  </div>
+  <div class="info-box" id="timezoneInfo"></div>
 
   <script>
     const clock = document.getElementById('clock');
@@ -186,11 +125,15 @@
       };
       clock.textContent = new Intl.DateTimeFormat('en-US', options).format(now);
 
-      // Date display
-      const dateOptions = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', timeZone: tz };
+      const dateOptions = {
+        weekday: 'long',
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric',
+        timeZone: tz
+      };
       dateDisplay.textContent = new Intl.DateTimeFormat('en-US', dateOptions).format(now);
 
-      // Timezone info
       const info = timezoneInfo[tz];
       if (info) {
         infoBox.innerHTML = `
@@ -205,7 +148,8 @@
 
     function toggleFormat() {
       use24Hour = !use24Hour;
-      document.querySelector('.toggle-button').textContent = use24Hour ? "Switch to 12-Hour" : "Switch to 24-Hour";
+      document.querySelector('.toggle-button').textContent =
+        use24Hour ? "Switch to 12-Hour" : "Switch to 24-Hour";
       updateClock();
     }
 

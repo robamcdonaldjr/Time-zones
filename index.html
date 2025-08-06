@@ -30,7 +30,11 @@
       background: rgba(255, 255, 255, 0.1);
       padding: 20px 40px;
       border-radius: 15px;
-      display: inline-block;
+    }
+
+    .date {
+      font-size: 1.5rem;
+      color: #ccc;
     }
 
     .timezone-select, .toggle-btn {
@@ -44,6 +48,15 @@
       background-color: #444;
       color: white;
       cursor: pointer;
+    }
+
+    .timezone-info {
+      background-color: rgba(255, 255, 255, 0.1);
+      padding: 10px 20px;
+      border-radius: 10px;
+      font-size: 1rem;
+      color: #ddd;
+      max-width: 350px;
     }
 
     .military-guide {
@@ -98,6 +111,8 @@
 
   <div class="container">
     <div class="clock" id="clock">--:--:--</div>
+    <div class="date" id="date">--</div>
+
     <select class="timezone-select" id="timezoneSelect">
       <option value="America/New_York">Eastern (New York)</option>
       <option value="America/Chicago">Central (Chicago)</option>
@@ -107,17 +122,60 @@
       <option value="America/Anchorage">Alaska (Anchorage)</option>
       <option value="Pacific/Honolulu">Hawaii (Honolulu)</option>
     </select>
+
     <button class="toggle-btn" id="toggleFormat">Switch to 12-Hour</button>
+
+    <div class="timezone-info" id="timezoneInfo"></div>
   </div>
 
   <script>
     const clock = document.getElementById('clock');
+    const dateDisplay = document.getElementById('date');
     const timezoneSelect = document.getElementById('timezoneSelect');
     const toggleButton = document.getElementById('toggleFormat');
+    const timezoneInfo = document.getElementById('timezoneInfo');
 
     let use24Hour = true;
 
-    function updateClock() {
+    const timeZoneFacts = {
+      "America/New_York": {
+        abbrev: "ET (Eastern Time)",
+        dst: "Yes (EDT during daylight saving time)",
+        cities: "New York, Boston, Miami, Atlanta"
+      },
+      "America/Chicago": {
+        abbrev: "CT (Central Time)",
+        dst: "Yes (CDT during daylight saving time)",
+        cities: "Chicago, Dallas, Minneapolis, Houston"
+      },
+      "America/Denver": {
+        abbrev: "MT (Mountain Time)",
+        dst: "Yes (MDT during daylight saving time)",
+        cities: "Denver, Salt Lake City"
+      },
+      "America/Phoenix": {
+        abbrev: "MT (Mountain Time – No DST)",
+        dst: "No (Arizona does not observe DST)",
+        cities: "Phoenix, Tucson"
+      },
+      "America/Los_Angeles": {
+        abbrev: "PT (Pacific Time)",
+        dst: "Yes (PDT during daylight saving time)",
+        cities: "Los Angeles, San Francisco, Seattle"
+      },
+      "America/Anchorage": {
+        abbrev: "AKT (Alaska Time)",
+        dst: "Yes (AKDT during daylight saving time)",
+        cities: "Anchorage, Fairbanks"
+      },
+      "Pacific/Honolulu": {
+        abbrev: "HT (Hawaii Time)",
+        dst: "No (Hawaii does not observe DST)",
+        cities: "Honolulu, Hilo"
+      }
+    };
+
+    function updateClockAndDate() {
       const now = new Date();
       const timeZone = timezoneSelect.value;
 
@@ -129,19 +187,42 @@
         hour12: !use24Hour
       };
 
+      const dateOptions = {
+        weekday: 'long',
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric',
+        timeZone
+      };
+
       clock.textContent = new Intl.DateTimeFormat('en-US', timeOptions).format(now);
+      dateDisplay.textContent = new Intl.DateTimeFormat('en-US', dateOptions).format(now);
     }
 
-    timezoneSelect.addEventListener('change', updateClock);
+    function updateTimezoneInfo() {
+      const tz = timezoneSelect.value;
+      const info = timeZoneFacts[tz];
+      timezoneInfo.innerHTML = `
+        <strong>Abbreviation:</strong> ${info.abbrev}<br>
+        <strong>DST:</strong> ${info.dst}<br>
+        <strong>Major Cities:</strong> ${info.cities}
+      `;
+    }
 
     toggleButton.addEventListener('click', () => {
       use24Hour = !use24Hour;
       toggleButton.textContent = use24Hour ? 'Switch to 12-Hour' : 'Switch to 24-Hour';
-      updateClock();
+      updateClockAndDate();
     });
 
-    setInterval(updateClock, 1000);
-    updateClock();
+    timezoneSelect.addEventListener('change', () => {
+      updateClockAndDate();
+      updateTimezoneInfo();
+    });
+
+    setInterval(updateClockAndDate, 1000);
+    updateClockAndDate();
+    updateTimezoneInfo();
   </script>
 </body>
 </html>

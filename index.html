@@ -23,14 +23,10 @@
       text-align: center;
       position: relative;
       z-index: 2;
-    }
-
-    .timezone-select {
-      font-size: 2rem;
-      padding: 10px 20px;
-      margin-bottom: 20px;
-      border-radius: 10px;
-      border: none;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 20px;
     }
 
     .clock {
@@ -39,6 +35,13 @@
       padding: 20px 40px;
       border-radius: 15px;
       display: inline-block;
+    }
+
+    .timezone-select {
+      font-size: 2rem;
+      padding: 10px 20px;
+      border-radius: 10px;
+      border: none;
     }
 
     .military-guide {
@@ -103,6 +106,7 @@
   </div>
 
   <div class="container">
+    <div class="clock" id="clock">--:--:--</div>
     <select class="timezone-select" id="timezoneSelect">
       <option value="America/New_York">Eastern (New York)</option>
       <option value="America/Chicago">Central (Chicago)</option>
@@ -111,7 +115,6 @@
       <option value="America/Anchorage">Alaska</option>
       <option value="Pacific/Honolulu">Hawaii</option>
     </select>
-    <div class="clock" id="clock">--:--:--</div>
   </div>
 
   <script>

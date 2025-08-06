@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>World Timezones</title>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500&display=swap" rel="stylesheet">
+  <style>
+    body {
+      background-color: black;
+      margin: 0;
+      font-family: 'Orbitron', monospace;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .clock {
+      margin: 10px;
+      padding: 15px;
+      width: 220px;
+      border-radius: 8px;
+      text-align: center;
+      transition: background-color 0.5s, color 0.5s;
+      box-shadow: 0 0 10px rgba(0,0,0,0.5);
+    }
+
+    .timezone {
+      font-size: 1em;
+      margin-bottom: 8px;
+    }
+
+    .time {
+      font-size: 1.5em;
+    }
+
+    .day {
+      background-color: white;
+      color: black;
+    }
+
+    .night {
+      background-color: black;
+      color: white;
+      border: 1px solid white;
+    }
+  </style>
+</head>
+<body>
+
+<script>
+  const timezones = Intl.supportedValuesOf('timeZone');
+
+  function createClock(timezone) {
+    const container = document.createElement('div');
+    container.className = 'clock';
+    container.id = `clock-${timezone.replaceAll('/', '_')}`;
+
+    const tzName = document.createElement('div');
+    tzName.className = 'timezone';
+    tzName.textContent = timezone;
+
+    const timeEl = document.createElement('div');
+    timeEl.className = 'time';
+    timeEl.id = timezone;
+
+    container.appendChild(tzName);
+    container.appendChild(timeEl);
+    document.body.appendChild(container);
+  }
+
+  function isDaytime(date, tz) {
+    const hour = new Intl.DateTimeFormat('en-US', {
+      hour: 'numeric',
+      hour12: false,
+      timeZone: tz
+    }).format(date);
+    return hour >= 6 && hour < 18; // 6AM to 5:59PM = daytime
+  }
+
+  function updateClocks() {
+    const now = new Date();
+    timezones.forEach(tz => {
+      const time = new Intl.DateTimeFormat('en-US', {
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit',
+        hour12: false,
+        timeZone: tz
+      }).format(now);
+
+      const el = document.getElementById(tz);
+      if (el) el.textContent = time;
+
+      const container = document.getElementById(`clock-${tz.replaceAll('/', '_')}`);
+      if (container) {
+        const isDay = isDaytime(now, tz);
+        container.classList.remove('day', 'night');
+        container.classList.add(isDay ? 'day' : 'night');
+      }
+    });
+  }
+
+  // Create clock elements for all timezones
+  timezones.forEach(tz => createClock(tz));
+
+  // Update the time every second
+  setInterval(updateClocks, 1000);
+  updateClocks();
+</script>
+
+</body>
+</html>

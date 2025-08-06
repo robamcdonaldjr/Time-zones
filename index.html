@@ -3,226 +3,154 @@
 <head>
   <meta charset="UTF-8" />
   <title>U.S. Time Zones</title>
-  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron&display=swap" rel="stylesheet" />
   <style>
     body {
       margin: 0;
-      font-family: 'Orbitron', monospace;
+      padding: 0;
       background-color: black;
       color: white;
-      height: 100vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    .container {
-      text-align: center;
-      z-index: 2;
+      font-family: 'Orbitron', monospace;
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 20px;
-    }
-
-    .clock {
-      font-size: 4rem;
-      background: rgba(255, 255, 255, 0.1);
-      padding: 20px 40px;
-      border-radius: 15px;
+      justify-content: center;
+      min-height: 100vh;
     }
 
     .date {
-      font-size: 1.5rem;
-      color: #ccc;
+      font-size: 1.5em;
+      margin-bottom: 10px;
     }
 
-    .timezone-select, .toggle-btn {
-      font-size: 1.5rem;
+    .clock {
+      font-size: 4em;
+      background-color: rgba(0, 0, 0, 0.5);
+      padding: 20px 40px;
+      border-radius: 12px;
+      margin-bottom: 30px;
+    }
+
+    select {
+      font-size: 1.5em;
       padding: 10px 20px;
-      border-radius: 10px;
-      border: none;
+      margin: 10px 0;
     }
 
-    .toggle-btn {
-      background-color: #444;
-      color: white;
+    .toggle-button {
+      margin: 20px;
+      padding: 10px 20px;
+      font-size: 1.2em;
       cursor: pointer;
     }
 
-    .timezone-info {
+    .info-box {
       background-color: rgba(255, 255, 255, 0.1);
-      padding: 10px 20px;
+      padding: 15px;
       border-radius: 10px;
-      font-size: 1rem;
-      color: #ddd;
-      max-width: 350px;
-    }
-
-    .military-guide {
-      position: absolute;
-      left: 20px;
-      top: 20px;
-      background-color: rgba(255, 255, 255, 0.1);
-      padding: 15px 25px;
-      border-radius: 10px;
-      font-size: 0.9rem;
-      line-height: 1.6;
-      max-width: 150px;
-    }
-
-    .military-guide h2 {
-      margin-top: 0;
-      font-size: 1rem;
+      font-size: 1.1em;
       text-align: center;
-      text-decoration: underline;
+      max-width: 600px;
     }
   </style>
 </head>
 <body>
 
-  <div class="military-guide">
-    <h2>Military Time</h2>
-    00:00 — Midnight<br>
-    01:00 — 1 AM<br>
-    02:00 — 2 AM<br>
-    03:00 — 3 AM<br>
-    04:00 — 4 AM<br>
-    05:00 — 5 AM<br>
-    06:00 — 6 AM<br>
-    07:00 — 7 AM<br>
-    08:00 — 8 AM<br>
-    09:00 — 9 AM<br>
-    10:00 — 10 AM<br>
-    11:00 — 11 AM<br>
-    12:00 — Noon<br>
-    13:00 — 1 PM<br>
-    14:00 — 2 PM<br>
-    15:00 — 3 PM<br>
-    16:00 — 4 PM<br>
-    17:00 — 5 PM<br>
-    18:00 — 6 PM<br>
-    19:00 — 7 PM<br>
-    20:00 — 8 PM<br>
-    21:00 — 9 PM<br>
-    22:00 — 10 PM<br>
-    23:00 — 11 PM
-  </div>
+  <div class="date" id="date"></div>
+  <div class="clock" id="clock">--:--:--</div>
 
-  <div class="container">
-    <div class="clock" id="clock">--:--:--</div>
-    <div class="date" id="date">--</div>
+  <select id="timezone">
+    <option value="America/New_York">Eastern (New York)</option>
+    <option value="America/Chicago">Central (Chicago)</option>
+    <option value="America/Denver">Mountain (Denver)</option>
+    <option value="America/Los_Angeles">Pacific (Los Angeles)</option>
+    <option value="America/Anchorage">Alaska (Anchorage)</option>
+    <option value="Pacific/Honolulu">Hawaii (Honolulu)</option>
+  </select>
 
-    <select class="timezone-select" id="timezoneSelect">
-      <option value="America/New_York">Eastern (New York)</option>
-      <option value="America/Chicago">Central (Chicago)</option>
-      <option value="America/Denver">Mountain (Denver)</option>
-      <option value="America/Phoenix">Mountain (Phoenix - no DST)</option>
-      <option value="America/Los_Angeles">Pacific (Los Angeles)</option>
-      <option value="America/Anchorage">Alaska (Anchorage)</option>
-      <option value="Pacific/Honolulu">Hawaii (Honolulu)</option>
-    </select>
+  <button class="toggle-button" onclick="toggleFormat()">Switch to 12-Hour</button>
 
-    <button class="toggle-btn" id="toggleFormat">Switch to 12-Hour</button>
-
-    <div class="timezone-info" id="timezoneInfo"></div>
-  </div>
+  <div class="info-box" id="timezoneInfo"></div>
 
   <script>
     const clock = document.getElementById('clock');
     const dateDisplay = document.getElementById('date');
-    const timezoneSelect = document.getElementById('timezoneSelect');
-    const toggleButton = document.getElementById('toggleFormat');
-    const timezoneInfo = document.getElementById('timezoneInfo');
-
+    const timezoneSelect = document.getElementById('timezone');
+    const infoBox = document.getElementById('timezoneInfo');
     let use24Hour = true;
 
-    const timeZoneFacts = {
+    const timezoneInfo = {
       "America/New_York": {
-        abbrev: "ET (Eastern Time)",
+        abbr: "ET (Eastern Time)",
         dst: "Yes (EDT during daylight saving time)",
         cities: "New York, Boston, Miami, Atlanta"
       },
       "America/Chicago": {
-        abbrev: "CT (Central Time)",
+        abbr: "CT (Central Time)",
         dst: "Yes (CDT during daylight saving time)",
-        cities: "Chicago, Dallas, Minneapolis, Houston"
+        cities: "Chicago, Dallas, Houston, Minneapolis"
       },
       "America/Denver": {
-        abbrev: "MT (Mountain Time)",
+        abbr: "MT (Mountain Time)",
         dst: "Yes (MDT during daylight saving time)",
-        cities: "Denver, Salt Lake City"
-      },
-      "America/Phoenix": {
-        abbrev: "MT (Mountain Time – No DST)",
-        dst: "No (Arizona does not observe DST)",
-        cities: "Phoenix, Tucson"
+        cities: "Denver, Salt Lake City, Albuquerque"
       },
       "America/Los_Angeles": {
-        abbrev: "PT (Pacific Time)",
+        abbr: "PT (Pacific Time)",
         dst: "Yes (PDT during daylight saving time)",
         cities: "Los Angeles, San Francisco, Seattle"
       },
       "America/Anchorage": {
-        abbrev: "AKT (Alaska Time)",
+        abbr: "AKT (Alaska Time)",
         dst: "Yes (AKDT during daylight saving time)",
-        cities: "Anchorage, Fairbanks"
+        cities: "Anchorage, Juneau, Fairbanks"
       },
       "Pacific/Honolulu": {
-        abbrev: "HT (Hawaii Time)",
-        dst: "No (Hawaii does not observe DST)",
-        cities: "Honolulu, Hilo"
+        abbr: "HT (Hawaii Time)",
+        dst: "No",
+        cities: "Honolulu, Hilo, Kailua"
       }
     };
 
-    function updateClockAndDate() {
+    function updateClock() {
       const now = new Date();
-      const timeZone = timezoneSelect.value;
-
-      const timeOptions = {
+      const tz = timezoneSelect.value;
+      const options = {
         hour: '2-digit',
         minute: '2-digit',
         second: '2-digit',
-        timeZone,
-        hour12: !use24Hour
+        hour12: !use24Hour,
+        timeZone: tz
       };
+      clock.textContent = new Intl.DateTimeFormat('en-US', options).format(now);
 
-      const dateOptions = {
-        weekday: 'long',
-        year: 'numeric',
-        month: 'long',
-        day: 'numeric',
-        timeZone
-      };
-
-      clock.textContent = new Intl.DateTimeFormat('en-US', timeOptions).format(now);
+      // Update the date
+      const dateOptions = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', timeZone: tz };
       dateDisplay.textContent = new Intl.DateTimeFormat('en-US', dateOptions).format(now);
+
+      // Update timezone info
+      const info = timezoneInfo[tz];
+      if (info) {
+        infoBox.innerHTML = `
+          <strong>Abbreviation:</strong> ${info.abbr}<br>
+          <strong>DST:</strong> ${info.dst}<br>
+          <strong>Major Cities:</strong> ${info.cities}
+        `;
+      } else {
+        infoBox.textContent = "";
+      }
     }
 
-    function updateTimezoneInfo() {
-      const tz = timezoneSelect.value;
-      const info = timeZoneFacts[tz];
-      timezoneInfo.innerHTML = `
-        <strong>Abbreviation:</strong> ${info.abbrev}<br>
-        <strong>DST:</strong> ${info.dst}<br>
-        <strong>Major Cities:</strong> ${info.cities}
-      `;
-    }
-
-    toggleButton.addEventListener('click', () => {
+    function toggleFormat() {
       use24Hour = !use24Hour;
-      toggleButton.textContent = use24Hour ? 'Switch to 12-Hour' : 'Switch to 24-Hour';
-      updateClockAndDate();
-    });
+      document.querySelector('.toggle-button').textContent = use24Hour ? "Switch to 12-Hour" : "Switch to 24-Hour";
+      updateClock();
+    }
 
-    timezoneSelect.addEventListener('change', () => {
-      updateClockAndDate();
-      updateTimezoneInfo();
-    });
+    timezoneSelect.addEventListener('change', updateClock);
 
-    setInterval(updateClockAndDate, 1000);
-    updateClockAndDate();
-    updateTimezoneInfo();
+    setInterval(updateClock, 1000);
+    updateClock();
   </script>
 </body>
 </html>

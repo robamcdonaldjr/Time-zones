@@ -12,17 +12,37 @@
       color: white;
       font-family: 'Orbitron', monospace;
       display: flex;
+      flex-direction: row;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    .main-content {
+      display: flex;
       flex-direction: column;
       align-items: center;
-      justify-content: center;
-      text-align: center;
-      min-height: 100vh;
       padding: 20px;
+      text-align: center;
+      max-width: 700px;
     }
 
     .date {
       font-size: 1.6em;
       margin-bottom: 10px;
+    }
+
+    .selectors {
+      display: flex;
+      gap: 40px;
+      flex-wrap: wrap;
+      margin-bottom: 20px;
+    }
+
+    select {
+      font-size: 1.5em;
+      padding: 10px 20px;
     }
 
     .clocks-container {
@@ -42,18 +62,6 @@
       min-width: 250px;
     }
 
-    .selectors {
-      display: flex;
-      gap: 40px;
-      flex-wrap: wrap;
-      margin-bottom: 20px;
-    }
-
-    select {
-      font-size: 1.5em;
-      padding: 10px 20px;
-    }
-
     .toggle-button {
       margin: 10px;
       padding: 10px 20px;
@@ -69,46 +77,75 @@
       max-width: 600px;
       margin-top: 20px;
     }
+
+    .map-container {
+      position: relative;
+      margin-left: 40px;
+      max-height: 600px;
+    }
+
+    .us-map {
+      width: 400px;
+      height: auto;
+      max-height: 600px;
+    }
+
+    .marker {
+      position: absolute;
+      width: 16px;
+      height: 16px;
+      background-color: red;
+      border-radius: 50%;
+      transform: translate(-50%, -50%);
+      pointer-events: none;
+    }
   </style>
 </head>
 <body>
 
-  <div class="date" id="date"></div>
+  <div class="main-content">
+    <div class="date" id="date"></div>
 
-  <div class="selectors">
-    <div>
-      <label for="timezone">Main Timezone:</label><br>
-      <select id="timezone">
-        <option value="America/New_York">Eastern (New York)</option>
-        <option value="America/Chicago">Central (Chicago)</option>
-        <option value="America/Denver">Mountain (Denver)</option>
-        <option value="America/Los_Angeles">Pacific (Los Angeles)</option>
-        <option value="America/Anchorage">Alaska (Anchorage)</option>
-        <option value="Pacific/Honolulu">Hawaii (Honolulu)</option>
-      </select>
+    <div class="selectors">
+      <div>
+        <label for="timezone">Main Timezone:</label><br>
+        <select id="timezone">
+          <option value="America/New_York">Eastern (New York)</option>
+          <option value="America/Chicago">Central (Chicago)</option>
+          <option value="America/Denver">Mountain (Denver)</option>
+          <option value="America/Los_Angeles">Pacific (Los Angeles)</option>
+          <option value="America/Anchorage">Alaska (Anchorage)</option>
+          <option value="Pacific/Honolulu">Hawaii (Honolulu)</option>
+        </select>
+      </div>
+
+      <div>
+        <label for="timezone-compare">Compare Timezone:</label><br>
+        <select id="timezone-compare">
+          <option value="America/New_York">Eastern (New York)</option>
+          <option value="America/Chicago">Central (Chicago)</option>
+          <option value="America/Denver">Mountain (Denver)</option>
+          <option value="America/Los_Angeles">Pacific (Los Angeles)</option>
+          <option value="America/Anchorage">Alaska (Anchorage)</option>
+          <option value="Pacific/Honolulu">Hawaii (Honolulu)</option>
+        </select>
+      </div>
     </div>
 
-    <div>
-      <label for="timezone-compare">Compare Timezone:</label><br>
-      <select id="timezone-compare">
-        <option value="America/New_York">Eastern (New York)</option>
-        <option value="America/Chicago">Central (Chicago)</option>
-        <option value="America/Denver">Mountain (Denver)</option>
-        <option value="America/Los_Angeles">Pacific (Los Angeles)</option>
-        <option value="America/Anchorage">Alaska (Anchorage)</option>
-        <option value="Pacific/Honolulu">Hawaii (Honolulu)</option>
-      </select>
+    <div class="clocks-container">
+      <div class="clock" id="clock">--:--:--</div>
+      <div class="clock" id="clock-compare">--:--:--</div>
     </div>
+
+    <button class="toggle-button" onclick="toggleFormat()">Switch to 12-Hour</button>
+
+    <div class="info-box" id="timezoneInfo"></div>
   </div>
 
-  <div class="clocks-container">
-    <div class="clock" id="clock">--:--:--</div> <!-- Main Timezone -->
-    <div class="clock" id="clock-compare">--:--:--</div> <!-- Compare Timezone -->
+  <div class="map-container">
+    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/e/e3/US_timezones_map.png/800px-US_timezones_map.png" alt="U.S. Time Zone Map" class="us-map" id="usMap">
+    <div class="marker" id="mapMarker"></div>
   </div>
-
-  <button class="toggle-button" onclick="toggleFormat()">Switch to 12-Hour</button>
-
-  <div class="info-box" id="timezoneInfo"></div>
 
   <script>
     const clockMain = document.getElementById('clock');
@@ -117,6 +154,7 @@
     const timezoneMain = document.getElementById('timezone');
     const timezoneCompare = document.getElementById('timezone-compare');
     const infoBox = document.getElementById('timezoneInfo');
+    const marker = document.getElementById('mapMarker');
     let use24Hour = true;
 
     const timezoneInfo = {
@@ -150,6 +188,15 @@
         dst: "No",
         cities: "Honolulu, Hilo, Kailua"
       }
+    };
+
+    const markerPositions = {
+      "America/New_York": { top: "42%", left: "82%" },
+      "America/Chicago": { top: "50%", left: "66%" },
+      "America/Denver": { top: "48%", left: "50%" },
+      "America/Los_Angeles": { top: "54%", left: "34%" },
+      "America/Anchorage": { top: "20%", left: "10%" },
+      "Pacific/Honolulu": { top: "75%", left: "8%" }
     };
 
     function formatTime(date, tz) {
@@ -190,6 +237,13 @@
         `;
       } else {
         infoBox.textContent = "";
+      }
+
+      // Move marker to selected region
+      const pos = markerPositions[mainTZ];
+      if (pos) {
+        marker.style.top = pos.top;
+        marker.style.left = pos.left;
       }
     }
 

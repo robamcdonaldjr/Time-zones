@@ -1,30 +1,209 @@
-<div class="selectors">
-  <div>
-    <label for="timezone">Main Timezone:</label><br>
-    <select id="timezone">
-      <option value="America/New_York">Eastern (New York)</option>
-      <option value="America/Chicago">Central (Chicago)</option>
-      <option value="America/Denver">Mountain (Denver)</option>
-      <option value="America/Los_Angeles">Pacific (Los Angeles)</option>
-      <option value="America/Anchorage">Alaska (Anchorage)</option>
-      <option value="Pacific/Honolulu">Hawaii (Honolulu)</option>
-    </select>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>U.S. Time Zones</title>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron&display=swap" rel="stylesheet" />
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      background-color: black;
+      color: white;
+      font-family: 'Orbitron', monospace;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      min-height: 100vh;
+      padding: 20px;
+    }
+
+    .date {
+      font-size: 1.6em;
+      margin-bottom: 10px;
+    }
+
+    .clocks-container {
+      display: flex;
+      gap: 40px;
+      margin-bottom: 30px;
+      align-items: center;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    .clock {
+      font-size: 4em;
+      background-color: rgba(0, 0, 0, 0.5);
+      padding: 20px 40px;
+      border-radius: 12px;
+      min-width: 250px;
+    }
+
+    .selectors {
+      display: flex;
+      gap: 40px;
+      flex-wrap: wrap;
+      margin-bottom: 20px;
+    }
+
+    select {
+      font-size: 1.5em;
+      padding: 10px 20px;
+    }
+
+    .toggle-button {
+      margin: 10px;
+      padding: 10px 20px;
+      font-size: 1.2em;
+      cursor: pointer;
+    }
+
+    .info-box {
+      background-color: rgba(255, 255, 255, 0.1);
+      padding: 15px;
+      border-radius: 10px;
+      font-size: 1.1em;
+      max-width: 600px;
+      margin-top: 20px;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="date" id="date"></div>
+
+  <div class="selectors">
+    <div>
+      <label for="timezone">Main Timezone:</label><br>
+      <select id="timezone">
+        <option value="America/New_York">Eastern (New York)</option>
+        <option value="America/Chicago">Central (Chicago)</option>
+        <option value="America/Denver">Mountain (Denver)</option>
+        <option value="America/Los_Angeles">Pacific (Los Angeles)</option>
+        <option value="America/Anchorage">Alaska (Anchorage)</option>
+        <option value="Pacific/Honolulu">Hawaii (Honolulu)</option>
+      </select>
+    </div>
+
+    <div>
+      <label for="timezone-compare">Compare Timezone:</label><br>
+      <select id="timezone-compare">
+        <option value="America/New_York">Eastern (New York)</option>
+        <option value="America/Chicago">Central (Chicago)</option>
+        <option value="America/Denver">Mountain (Denver)</option>
+        <option value="America/Los_Angeles">Pacific (Los Angeles)</option>
+        <option value="America/Anchorage">Alaska (Anchorage)</option>
+        <option value="Pacific/Honolulu">Hawaii (Honolulu)</option>
+      </select>
+    </div>
   </div>
 
-  <div>
-    <label for="timezone-compare">Compare Timezone:</label><br>
-    <select id="timezone-compare">
-      <option value="America/New_York">Eastern (New York)</option>
-      <option value="America/Chicago">Central (Chicago)</option>
-      <option value="America/Denver">Mountain (Denver)</option>
-      <option value="America/Los_Angeles">Pacific (Los Angeles)</option>
-      <option value="America/Anchorage">Alaska (Anchorage)</option>
-      <option value="Pacific/Honolulu">Hawaii (Honolulu)</option>
-    </select>
+  <div class="clocks-container">
+    <div class="clock" id="clock">--:--:--</div> <!-- Main Timezone -->
+    <div class="clock" id="clock-compare">--:--:--</div> <!-- Compare Timezone -->
   </div>
-</div>
 
-<div class="clocks-container">
-  <div class="clock" id="clock">--:--:--</div> <!-- Main Timezone on the LEFT -->
-  <div class="clock" id="clock-compare">--:--:--</div> <!-- Compare Timezone on the RIGHT -->
-</div>
+  <button class="toggle-button" onclick="toggleFormat()">Switch to 12-Hour</button>
+
+  <div class="info-box" id="timezoneInfo"></div>
+
+  <script>
+    const clockMain = document.getElementById('clock');
+    const clockCompare = document.getElementById('clock-compare');
+    const dateDisplay = document.getElementById('date');
+    const timezoneMain = document.getElementById('timezone');
+    const timezoneCompare = document.getElementById('timezone-compare');
+    const infoBox = document.getElementById('timezoneInfo');
+    let use24Hour = true;
+
+    const timezoneInfo = {
+      "America/New_York": {
+        abbr: "ET (Eastern Time)",
+        dst: "Yes (EDT during daylight saving time)",
+        cities: "New York, Boston, Miami, Atlanta"
+      },
+      "America/Chicago": {
+        abbr: "CT (Central Time)",
+        dst: "Yes (CDT during daylight saving time)",
+        cities: "Chicago, Dallas, Houston, Minneapolis"
+      },
+      "America/Denver": {
+        abbr: "MT (Mountain Time)",
+        dst: "Yes (MDT during daylight saving time)",
+        cities: "Denver, Salt Lake City, Albuquerque"
+      },
+      "America/Los_Angeles": {
+        abbr: "PT (Pacific Time)",
+        dst: "Yes (PDT during daylight saving time)",
+        cities: "Los Angeles, San Francisco, Seattle"
+      },
+      "America/Anchorage": {
+        abbr: "AKT (Alaska Time)",
+        dst: "Yes (AKDT during daylight saving time)",
+        cities: "Anchorage, Juneau, Fairbanks"
+      },
+      "Pacific/Honolulu": {
+        abbr: "HT (Hawaii Time)",
+        dst: "No",
+        cities: "Honolulu, Hilo, Kailua"
+      }
+    };
+
+    function formatTime(date, tz) {
+      return new Intl.DateTimeFormat('en-US', {
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit',
+        hour12: !use24Hour,
+        timeZone: tz
+      }).format(date);
+    }
+
+    function formatDate(date, tz) {
+      return new Intl.DateTimeFormat('en-US', {
+        weekday: 'long',
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric',
+        timeZone: tz
+      }).format(date);
+    }
+
+    function updateClocks() {
+      const now = new Date();
+      const mainTZ = timezoneMain.value;
+      const compareTZ = timezoneCompare.value;
+
+      clockMain.textContent = formatTime(now, mainTZ);
+      clockCompare.textContent = formatTime(now, compareTZ);
+      dateDisplay.textContent = formatDate(now, mainTZ);
+
+      const info = timezoneInfo[mainTZ];
+      if (info) {
+        infoBox.innerHTML = `
+          <strong>Abbreviation:</strong> ${info.abbr}<br>
+          <strong>DST:</strong> ${info.dst}<br>
+          <strong>Major Cities:</strong> ${info.cities}
+        `;
+      } else {
+        infoBox.textContent = "";
+      }
+    }
+
+    function toggleFormat() {
+      use24Hour = !use24Hour;
+      document.querySelector('.toggle-button').textContent =
+        use24Hour ? "Switch to 12-Hour" : "Switch to 24-Hour";
+      updateClocks();
+    }
+
+    timezoneMain.addEventListener('change', updateClocks);
+    timezoneCompare.addEventListener('change', updateClocks);
+    setInterval(updateClocks, 1000);
+    updateClocks();
+  </script>
+</body>
+</html>
